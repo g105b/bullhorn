@@ -11,7 +11,7 @@ Once authenticated, simply run `api/endpoint.php` and pass in the arguments. The
 
 For example:
 
-`api/endpoint.php query/jobOrder fields=title where=isOpen=true count=100 start=0`
+`api/endpoint.php query/JobOrder fields=title where=isOpen=true count=100 start=0`
 
 will call a URL similar to:
 
