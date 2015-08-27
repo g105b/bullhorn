@@ -1,2 +1,2 @@
 #!/bin/bash
-api/endpoint.php GET query/JobOrder fields=* where=isOpen=true count=100 start=0 > /home/ablewild/cordius.co.uk/bullhorn/data/jobs.json
+api/endpoint.php GET query/JobOrder fields=* where=isOpen=true count=100 start=0 > data/jobs.json
