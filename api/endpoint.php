@@ -19,10 +19,11 @@ if(!isset($argv)) {
 }
 
 $url = Data::get(KEY_REST_URL);
-$endpoint = $argv[1];
+$method = strtolower($argv[1]);
+$endpoint = $argv[2];
 
 $query = "?";
-for($i = 2, $c = count($argv); $i < $c; $i++) {
+for($i = 3, $c = count($argv); $i < $c; $i++) {
 	$query .= $argv[$i] . "&";
 }
 
@@ -31,7 +32,7 @@ $restToken = Data::get(KEY_REST_TOKEN);
 if(DEBUG)echo "Performing call...\n";
 
 $curl = new Curl();
-$curl->get("$url$endpoint$query&BhRestToken=$restToken");
+$curl->$method("$url$endpoint$query&BhRestToken=$restToken");
 
 if(DEBUG)echo "\n\n";
 echo $curl->response . "\n";
