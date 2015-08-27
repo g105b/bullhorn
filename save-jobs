@@ -1,2 +1,3 @@
 #!/bin/bash
-api/endpoint.php GET query/JobOrder fields=* where=isOpen=true count=100 start=0 > data/jobs.json
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+api/endpoint.php GET query/JobOrder fields=* where=isOpen=true count=100 start=0 > $DIR/data/jobs.json
