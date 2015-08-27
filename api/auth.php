@@ -5,7 +5,6 @@ use Curl\Curl;
 
 define("KEY_CLIENT_ID", "client-id");
 define("KEY_CLIENT_SECRET", "client-secret");
-define("KEY_CORPORATION_TOKEN", "corporation-token");
 define("KEY_USERNAME", "username");
 define("KEY_PASSWORD", "password");
 define("KEY_REFRESH_TOKEN", "refresh-token");

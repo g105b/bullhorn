@@ -8,3 +8,11 @@ To authenticate, ready to call any endpoint, run `api/auth.php`. It will list ou
 ## Endpoint
 
 Once authenticated, simply run `api/endpoint.php` and pass in the arguments. The first argument should be the API endpoint (the part after the corporation token). The script will pass back the JSON response from the API.
+
+For example:
+
+`api/endpoint.php query/jobOrder fields=title where=isOpen=true count=100 start=0`
+
+will call a URL similar to:
+
+`https://restX.bullhornstaffing.com/rest-services/12345/query/jobOrder?fields=title&where=isOpen=true&count=100&start=0&&BhRestToken=acbdefg-1234-5678-0000-80170f515268`
