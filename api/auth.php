@@ -17,7 +17,6 @@ echo "\n";
 
 foreach([
 KEY_CLIENT_ID,
-KEY_CORPORATION_TOKEN,
 KEY_USERNAME,
 KEY_PASSWORD,] as $name) {
 	$data = Data::get($name);
