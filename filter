@@ -1,0 +1,50 @@
+#!/usr/bin/php
+<?php
+if($argc <= 1) {
+	die("Usage: filter [data name] [fieldName=fieldValue] [..]\n"
+	. "e.g. filter jobs isOpen=true\n"
+	. "or use nested properties e.g. filter jobs address/city=Derby\n\n");
+}
+
+$file = "data/$argv[1].json";
+
+if(!is_file($file)) {
+	die("Error: Can't find file $file\n");
+}
+
+$obj = json_decode(file_get_contents($file));
+$output = [];
+
+foreach($obj->data as $data) {
+	if($argc == 2) {
+		$output []= $data;
+		continue;
+	}
+
+	for($i = 2; $i < $argc; $i++) {
+		$search = explode("=", $argv[$i]);
+
+		if(strstr($search[0], "/")) {
+			$search[0] = explode("/", $search[0]);
+		}
+
+		$pointer = $data;
+
+		if(is_array($search[0])) {
+			foreach($search[0] as $leaf) {
+				$pointer = $pointer->$leaf;
+			}
+		}
+		else {
+			$pointer = $pointer->$search[0];
+		}
+
+		if($pointer == $search[1]) {
+			$output []= $data;
+		}
+	}
+
+}
+
+echo json_encode($output) . "\n";
+exit;
