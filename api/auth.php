@@ -10,10 +10,11 @@ define("KEY_PASSWORD", "password");
 define("KEY_REFRESH_TOKEN", "refresh-token");
 define("KEY_REST_TOKEN", "rest-token");
 define("KEY_REST_URL", "rest-url");
+define("DEBUG", false);
 
 require __DIR__ . "/../vendor/autoload.php";
 
-echo "\n";
+if(DEBUG)echo "\n";
 
 foreach([
 KEY_CLIENT_ID,
@@ -31,7 +32,7 @@ $curl->setUserAgent("Greg's sucky API fixer 4000");
 $curl->setOpt(CURLOPT_FOLLOWLOCATION, true);
 
 if(is_null(Data::get(KEY_REFRESH_TOKEN)) ) {
-	echo "Logging in...\n";
+	if(DEBUG)echo "Logging in...\n";
 	$curl->post("https://auth.bullhornstaffing.com/oauth/authorize", [
 		"response_type" => "code",
 		"client_id" => Data::get(KEY_CLIENT_ID),
@@ -56,8 +57,8 @@ if(is_null(Data::get(KEY_REFRESH_TOKEN)) ) {
 		exit(1);
 	}
 
-	echo "Got authorization code: $authCode\n";
-	echo "Getting fake grant...\n";
+	if(DEBUG)echo "Got authorization code: $authCode\n";
+	if(DEBUG)echo "Getting fake grant...\n";
 
 	$curl->post("https://auth.bullhornstaffing.com/oauth/token"
 	 . "?code=$authCode", [
@@ -67,16 +68,16 @@ if(is_null(Data::get(KEY_REFRESH_TOKEN)) ) {
 	]);
 
 	$grantObj = json_decode($curl->response);
-	echo "Got access token: " . $grantObj->access_token . "\n";
-	echo "Got refresh token: " . $grantObj->refresh_token . "\n";
+	if(DEBUG)echo "Got access token: " . $grantObj->access_token . "\n";
+	if(DEBUG)echo "Got refresh token: " . $grantObj->refresh_token . "\n";
 
 	Data::set(KEY_REFRESH_TOKEN, $grantObj->refresh_token);
 }
 else {
-	echo "Refresh token is set!\n";
+	if(DEBUG)echo "Refresh token is set!\n";
 }
 
-echo "Refreshing...\n";
+if(DEBUG)echo "Refreshing...\n";
 
 $curl->post("https://auth.bullhornstaffing.com/oauth/token", [
 	"grant_type" => "refresh_token",
@@ -86,21 +87,21 @@ $curl->post("https://auth.bullhornstaffing.com/oauth/token", [
 ]);
 
 $grantObj = json_decode($curl->response);
-echo "Got access token: " . $grantObj->access_token . "\n";
-echo "Got refresh token: " . $grantObj->refresh_token . "\n";
+if(DEBUG)echo "Got access token: " . $grantObj->access_token . "\n";
+if(DEBUG)echo "Got refresh token: " . $grantObj->refresh_token . "\n";
 
 $accessToken = $grantObj->access_token;
 Data::set(KEY_REFRESH_TOKEN, $grantObj->refresh_token);
 
-echo "Getting the Bullhorn rest token...\n";
+if(DEBUG)echo "Getting the Bullhorn rest token...\n";
 
 $curl->get("https://rest.bullhornstaffing.com/rest-services/login"
  . "?version=*&access_token=$accessToken");
 
 $restObj = json_decode($curl->response);
-echo "Got rest details.\n\n";
+if(DEBUG)echo "Got rest details.\n\n";
 
 Data::set(KEY_REST_TOKEN, $restObj->BhRestToken);
 Data::set(KEY_REST_URL, $restObj->restUrl);
 
-echo "All done.\n\n";
+if(DEBUG)echo "All done.\n\n";
