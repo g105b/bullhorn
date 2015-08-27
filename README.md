@@ -1,11 +1,41 @@
 # bullhorn
 Quick access to the Bullhorn api
 
-## Authenticate
+## Automation
+
+To cache Bullhorn's jobs to a JSON file on a server for fast access, use the `save-jobs`. This can be automated on a Linux server useing a cron task.
+
+Example cron:
+
+```
+# Update jobs just before the hour...
+55 * * * * /home/user/project/save-jobs
+```
+
+A `jobs.json` file is created within the `data` directory.
+
+## Filtering the `jobs.json` file.
+
+In order to retrieve the jobs for use on a website or elsewhere, use the `filter` command. The first argument to filter is the name of the data to filter upon. For example, to retrieve ALL jobs:
+
+```
+filter jobs
+```
+
+In order to only retrieve specific jobs that match given criteria, pass in the search terms via CLI arguments. For example:
+
+```
+filter jobs isOpen=true # only returns jobs classed with this flag set to true.
+filter jobs address/city=Derby # notice the use of nested properties.
+```
+
+## API usage
+
+### Authenticate
 
 To authenticate, ready to call any endpoint, run `api/auth.php`. It will list out the files required to store credentials (ID, secret, etc).
 
-## Endpoint
+### Endpoint
 
 Once authenticated, simply run `api/endpoint.php` and pass in the arguments. The first argument should be the API endpoint (the part after the corporation token). The script will pass back the JSON response from the API.
 
