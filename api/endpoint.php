@@ -10,13 +10,8 @@ require __DIR__ . "/../vendor/autoload.php";
 
 echo "\n";
 
-foreach([KEY_REST_TOKEN, KEY_REST_URL] as $name) {
-	$data = Data::get($name);
-	if(!$data) {
-		echo "Missing auth data - please run api/auth.php again.\n";
-		exit(1);
-	}
-}
+echo "Refreshing auth data...\n";
+passthru(__DIR__ . "/auth.php");
 
 if(!isset($argv)) {
 	$argv = [];
@@ -31,6 +26,8 @@ for($i = 2, $c = count($argv); $i < $c; $i++) {
 }
 
 $restToken = Data::get(KEY_REST_TOKEN);
+
+echo "Performing call...\n";
 
 $curl = new Curl();
 $curl->get("$url$endpoint$query&BhRestToken=$restToken");
