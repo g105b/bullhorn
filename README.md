@@ -16,3 +16,29 @@ For example:
 will call a URL similar to:
 
 `https://restX.bullhornstaffing.com/rest-services/12345/query/jobOrder?fields=title&where=isOpen=true&count=100&start=0&&BhRestToken=acbdefg-1234-5678-0000-80170f515268`
+
+Output:
+
+```json
+{
+  "start" : 0,
+  "count" : 8,
+  "data" : [ {
+    "title" : "Test Vacancy 4 Greg"
+  }, {
+    "title" : "Test vacancy"
+  }, {
+    "title" : "Planned Maintenance Team Leader"
+  }, {
+    "title" : "Software Test Engineer / Software Engineer in Test"
+  }, {
+    "title" : "Test Vacancy - Engineering"
+  }, {
+    "title" : "Senior PHP Developer"
+  }, {
+    "title" : "Retail Logistics Manager"
+  }, {
+    "title" : "Mechanical Maintenance Engineer"
+  } ]
+}
+```
