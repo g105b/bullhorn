@@ -31,7 +31,7 @@ $curl = new Curl();
 $curl->setUserAgent("Greg's sucky API fixer 4000");
 $curl->setOpt(CURLOPT_FOLLOWLOCATION, true);
 
-if(is_null(Data::get(KEY_REFRESH_TOKEN)) ) {
+if(is_null(Data::get(KEY_REFRESH_TOKEN)) || true) {
 	if(DEBUG)echo "Logging in...\n";
 	$curl->post("https://auth.bullhornstaffing.com/oauth/authorize", [
 		"response_type" => "code",
