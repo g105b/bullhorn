@@ -26,14 +26,50 @@ $query = "?";
 for($i = 3, $c = count($argv); $i < $c; $i++) {
 	$query .= $argv[$i] . "&";
 }
+$obj = new \StdClass();
 
 $restToken = Data::get(KEY_REST_TOKEN);
 
-if(DEBUG)echo "Performing call...\n";
+if(DEBUG)echo "Performing $method call...\n";
 
-$curl = new Curl();
-$curl->$method("$url$endpoint$query&BhRestToken=$restToken");
+$ch = curl_init();
+
+if($method === "put") {
+	for($i = 3, $c = count($argv); $i < $c; $i++) {
+		$eq = strpos($argv[$i], "=");
+		$key = substr($argv[$i], 0, $eq);
+		$value = substr($argv[$i], $eq + 1);
+		$obj->$key = $value;
+	}
+
+	$query = "";
+	$json = json_encode($obj);
+
+	curl_setopt($ch, CURLOPT_POST, true);
+	curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+	curl_setopt($curl->curl, CURLOPT_HTTPHEADER, ["Content-Type: text/plain"]);
+
+	if(DEBUG)echo "\n\n$json\n\n";
+}
+
+$startUrl = "$url$endpoint$query";
+$endUrl = "BhRestToken=$restToken";
+
+$fullUrl = $startUrl;
+if(strstr($startUrl, "?")) {
+	$fullUrl = "$startUrl&$endUrl";
+}
+else {
+	$fullUrl = "$startUrl?$endUrl";
+}
+
+curl_setopt($ch, CURLOPT_URL, $fullUrl );
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true );
+curl_setopt($ch, CURLOPT_CUSTOMREQUEST, strtoupper($method));
+
+if(DEBUG)echo "\n\n$fullUrl\n\n";
+$result = curl_exec($ch);
 
 if(DEBUG)echo "\n\n";
-echo $curl->response . "\n";
+echo $result . "\n";
 if(DEBUG)echo "\n";
