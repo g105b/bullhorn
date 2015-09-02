@@ -34,11 +34,21 @@ if(DEBUG)echo "Performing $method call...\n";
 
 $ch = curl_init();
 
+$formData = null;
+
 if($method === "put") {
 	for($i = 3, $c = count($argv); $i < $c; $i++) {
 		$eq = strpos($argv[$i], "=");
 		$key = substr($argv[$i], 0, $eq);
 		$value = substr($argv[$i], $eq + 1);
+
+		if($key === "--file") {
+			$fh = fopen($value, "r");
+			curl_setopt($ch, CURLOPT_INFILE, $fh);
+			curl_setopt($ch, CURLOPT_INFILESIZE, filesize($value));
+			continue;
+		}
+
 		$obj->$key = $value;
 	}
 
@@ -47,7 +57,7 @@ if($method === "put") {
 
 	curl_setopt($ch, CURLOPT_POST, true);
 	curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
-	curl_setopt($curl->curl, CURLOPT_HTTPHEADER, ["Content-Type: text/plain"]);
+	curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: text/plain"]);
 
 	if(DEBUG)echo "\n\n$json\n\n";
 }
@@ -61,6 +71,12 @@ if(strstr($startUrl, "?")) {
 }
 else {
 	$fullUrl = "$startUrl?$endUrl";
+}
+
+if(!empty($formData)) {
+	curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: multipart/form-data"]);
+	curl_setopt($ch, CURLOPT_POSTFIELDS, $formData);
+	var_dump($formData);
 }
 
 curl_setopt($ch, CURLOPT_URL, $fullUrl );
