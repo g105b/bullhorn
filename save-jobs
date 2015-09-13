@@ -1,3 +1,3 @@
 #!/bin/bash
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-api/endpoint.php GET query/JobOrder fields=* where=isOpen=true count=100 start=0 > $DIR/data/jobs.json
+api/endpoint.php GET query/JobOrder fields=* where=isOpen=true count=100 start=0 > $DIR/data/jobs.json.incoming && mv $DIR/data/jobs.json.incoming $DIR/data/jobs.json
