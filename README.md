@@ -46,13 +46,14 @@ $filePath = $_FILES["cv"]["tmp_name"];
 
 exec("api/endpoint.php PUT entity/Candidate firstName=$firstName lastName=$lastName name=$firstName\ $lastName", $outputLines);
 
-$jsonResponse = json_decode(explode("\n", $outputLines));
+$jsonResponse = json_decode(implode("\n", $outputLines));
 
 $newCandidateID = $jsonResponse->changedEntityId;
 
+$outputLines = [];
 exec("api/endpoint.php PUT file/Candidate/$newCandidateID/raw externalID=Portfolio fileType=SAMPLE --file=$filePath", $outputLines);
 
-$jsonResponse = json_decode(explode("\n", $outputLines));
+$jsonResponse = json_decode(implode("\n", $outputLines));
 
 // Check the success:
 if(!isset($jsonResponse->fileId)) {
