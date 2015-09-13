@@ -29,6 +29,39 @@ filter jobs isOpen=true # only returns jobs classed with this flag set to true.
 filter jobs address/city=Derby # notice the use of nested properties.
 ```
 
+## Uploading a CV
+
+Once there is a file uploaded through PHP, there are two enpoints that need to be called. Firstly, a new "candidate" needs creating, then the CV file needs uploading to Bullhorn.
+
+To create a candidate, pass the first and last names of the POSTed data to the `entity/Candidate` endpoint, which will return the ID of the newly created candidate.
+
+With the candidate's ID, sent the uploaded CV file to the `file/Candidate` endpoint along with the candidate's ID.
+
+Below is an example flow of how to handle this. The snippet assumes your script has the `$firstName`, `$lastName` and `$filePath` variables set. This can be done by accessing the `$_POST` and `$_FILES` globals.
+
+```php
+$firstName = $_POST["firstName"];
+$lastName = $_POST["lastName"];
+$filePath = $_FILES["cv"]["tmp_name"];
+
+exec("api/endpoint.php PUT entity/Candidate firstName=$firstName lastName=$lastName name=$firstName\ $lastName", $outputLines);
+
+$jsonResponse = json_decode(explode("\n", $outputLines));
+
+$newCandidateID = $jsonResponse->changedEntityId;
+
+exec("api/endpoint.php PUT file/Candidate/$newCandidateID/raw externalID=Portfolio fileType=SAMPLE --file=$filePath", $outputLines);
+
+$jsonResponse = json_decode(explode("\n", $outputLines));
+
+// Check the success:
+if(!isset($jsonResponse->fileId)) {
+  die("Something went wrong...");
+}
+```
+
+When a file is uploaded on your server, it will likely be placed in the system's `/tmp` directory.
+
 ## API usage
 
 ### Authenticate
@@ -72,3 +105,21 @@ Output:
   } ]
 }
 ```
+
+Other notable examples:
+
+`api/endpoint.php PUT entity/Candidate firstName=Test lastName=Testerson name=Test\ Testerson`
+
+Creates a new candidate by name. Returned is the candidate's ID:
+
+```json
+{
+  "changedEntityType" : "Candidate",
+  "changedEntityId" : 12345,
+  "changeType" : "INSERT"
+}
+```
+
+With this ID you can upload a CV and associate it:
+
+`api/endpoint.php PUT file/Candidate/12345/raw externalID=Portfolio fileType=SAMPLE --file=/path/to/cv.doc`

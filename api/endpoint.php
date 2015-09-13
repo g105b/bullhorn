@@ -34,7 +34,7 @@ if(DEBUG)echo "Performing $method call...\n";
 
 $ch = curl_init();
 
-$formData = null;
+$fileUpload = false;
 
 if($method === "put") {
 	for($i = 3, $c = count($argv); $i < $c; $i++) {
@@ -43,9 +43,13 @@ if($method === "put") {
 		$value = substr($argv[$i], $eq + 1);
 
 		if($key === "--file") {
-			$fh = fopen($value, "r");
-			curl_setopt($ch, CURLOPT_INFILE, $fh);
-			curl_setopt($ch, CURLOPT_INFILESIZE, filesize($value));
+			curl_setopt($ch, CURLOPT_SAFE_UPLOAD, false);
+			$obj->{"file"} = "@$value";
+			$fileUpload = $value;
+			curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: multipart/form-data; boundary=----------------------------4ebf00fbcf09"]);
+			// $fh = fopen($value, "r");
+			// curl_setopt($ch, CURLOPT_INFILE, $fh);
+			// curl_setopt($ch, CURLOPT_INFILESIZE, filesize($value));
 			continue;
 		}
 
@@ -53,11 +57,15 @@ if($method === "put") {
 	}
 
 	$query = "";
+	// var_dump($obj);die();
 	$json = json_encode($obj);
 
 	curl_setopt($ch, CURLOPT_POST, true);
 	curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
-	curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: text/plain"]);
+
+	if(!$fileUpload) {
+		curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: text/plain"]);
+	}
 
 	if(DEBUG)echo "\n\n$json\n\n";
 }
@@ -73,18 +81,25 @@ else {
 	$fullUrl = "$startUrl?$endUrl";
 }
 
-if(!empty($formData)) {
-	curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: multipart/form-data"]);
-	curl_setopt($ch, CURLOPT_POSTFIELDS, $formData);
-	var_dump($formData);
-}
 
 curl_setopt($ch, CURLOPT_URL, $fullUrl );
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true );
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, strtoupper($method));
 
 if(DEBUG)echo "\n\n$fullUrl\n\n";
-$result = curl_exec($ch);
+
+$result = "";
+
+if($fileUpload) {
+	$curlCommand = "curl -X PUT -H 'Cache-Control: no-cache' "
+		. "-H 'Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW' "
+		. "-F 'multipart/form-data=@$fileUpload' "
+		. "'$fullUrl&externalID=Portfolio'";
+	passthru($curlCommand);
+}
+else {
+	$result = curl_exec($ch);
+}
 
 if(DEBUG)echo "\n\n";
 echo $result . "\n";
