@@ -37,34 +37,35 @@ $ch = curl_init();
 $fileUpload = false;
 
 if($method === "put") {
-	for($i = 3, $c = count($argv); $i < $c; $i++) {
-		$eq = strpos($argv[$i], "=");
-		$key = substr($argv[$i], 0, $eq);
-		$value = substr($argv[$i], $eq + 1);
+	if(strpos($argv[3], "{") === 0) {
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $argv[3]);
+	}
+	else {
+		for($i = 3, $c = count($argv); $i < $c; $i++) {
+			$eq = strpos($argv[$i], "=");
+			$key = substr($argv[$i], 0, $eq);
+			$value = substr($argv[$i], $eq + 1);
 
-		if($key === "--file") {
-			curl_setopt($ch, CURLOPT_SAFE_UPLOAD, false);
-			$obj->{"file"} = "@$value";
-			$fileUpload = $value;
-			curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: multipart/form-data; boundary=----------------------------4ebf00fbcf09"]);
-			// $fh = fopen($value, "r");
-			// curl_setopt($ch, CURLOPT_INFILE, $fh);
-			// curl_setopt($ch, CURLOPT_INFILESIZE, filesize($value));
-			continue;
+			if($key === "--file") {
+				curl_setopt($ch, CURLOPT_SAFE_UPLOAD, false);
+				$obj->{"file"} = "@$value";
+				$fileUpload = $value;
+				curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: multipart/form-data; boundary=----------------------------4ebf00fbcf09"]);
+				continue;
+			}
+
+			$obj->$key = $value;
 		}
 
-		$obj->$key = $value;
-	}
+		$query = "";
+		$json = json_encode($obj);
 
-	$query = "";
-	// var_dump($obj);die();
-	$json = json_encode($obj);
+		curl_setopt($ch, CURLOPT_POST, true);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
 
-	curl_setopt($ch, CURLOPT_POST, true);
-	curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
-
-	if(!$fileUpload) {
-		curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: text/plain"]);
+		if(!$fileUpload) {
+			curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: text/plain"]);
+		}
 	}
 
 	if(DEBUG)echo "\n\n$json\n\n";
