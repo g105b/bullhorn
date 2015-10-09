@@ -24,6 +24,10 @@ $endpoint = $argv[2];
 
 $query = "?";
 for($i = 3, $c = count($argv); $i < $c; $i++) {
+	if($argv[$i][0] === "{") {
+		continue;
+	}
+
 	$query .= $argv[$i] . "&";
 }
 $obj = new \StdClass();
@@ -33,12 +37,15 @@ $restToken = Data::get(KEY_REST_TOKEN);
 if(DEBUG)echo "Performing $method call...\n";
 
 $ch = curl_init();
+#curl_setopt($ch, CURLOPT_VERBOSE, true);
+#curl_setopt($ch, CURLOPT_STDERR, STDOUT);
 
 $fileUpload = false;
 
 if($method === "put") {
 	if(strpos($argv[3], "{") === 0) {
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $argv[3]);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-type: application/json"));
+		curl_setopt($ch, CURLOPT_POSTFIELDS, str_replace("'", "\"", $argv[3]));
 	}
 	else {
 		for($i = 3, $c = count($argv); $i < $c; $i++) {
